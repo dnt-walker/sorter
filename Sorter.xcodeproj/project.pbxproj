@@ -1,0 +1,426 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1C00000000000000000000001 /* SorterApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000001 /* SorterApp.swift */; };
+		1C00000000000000000000002 /* NetworkDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000002 /* NetworkDevice.swift */; };
+		1C00000000000000000000003 /* RouteEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000003 /* RouteEntry.swift */; };
+		1C00000000000000000000004 /* ManagedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000004 /* ManagedRoute.swift */; };
+		1C00000000000000000000005 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000005 /* CommandRunner.swift */; };
+		1C00000000000000000000006 /* IPValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000006 /* IPValidator.swift */; };
+		1C00000000000000000000007 /* RouteTableParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000007 /* RouteTableParser.swift */; };
+		1C00000000000000000000008 /* PrivilegedRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000008 /* PrivilegedRunner.swift */; };
+		1C00000000000000000000009 /* RouteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000009 /* RouteService.swift */; };
+		1C0000000000000000000000A /* NetworkDeviceService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000A /* NetworkDeviceService.swift */; };
+		1C0000000000000000000000B /* ManagedRouteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000B /* ManagedRouteStore.swift */; };
+		1C0000000000000000000000C /* DevicesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000C /* DevicesViewModel.swift */; };
+		1C0000000000000000000000D /* RoutesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000D /* RoutesViewModel.swift */; };
+		1C0000000000000000000000E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000E /* ContentView.swift */; };
+		1C0000000000000000000000F /* DevicesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000000F /* DevicesView.swift */; };
+		1C00000000000000000000010 /* RoutesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000010 /* RoutesView.swift */; };
+		1C00000000000000000000011 /* RouteEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000011 /* RouteEditView.swift */; };
+		1C00000000000000000000013 /* MenuBarStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000013 /* MenuBarStatusView.swift */; };
+		1C00000000000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000012 /* Assets.xcassets */; };
+		1C00000000000000000000014 /* TunnelConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000014 /* TunnelConfig.swift */; };
+		1C00000000000000000000015 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000015 /* KeychainHelper.swift */; };
+		1C00000000000000000000016 /* TunnelConfigStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000016 /* TunnelConfigStore.swift */; };
+		1C00000000000000000000017 /* SSHTunnelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000017 /* SSHTunnelService.swift */; };
+		1C00000000000000000000018 /* LocalPortListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000018 /* LocalPortListener.swift */; };
+		1C00000000000000000000019 /* TunnelsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000019 /* TunnelsViewModel.swift */; };
+		1C0000000000000000000001A /* TunnelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001A /* TunnelsView.swift */; };
+		1C0000000000000000000001B /* TunnelEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001B /* TunnelEditView.swift */; };
+		2C00000000000000000000001 /* Citadel in Frameworks */ = {isa = PBXBuildFile; productRef = 2B00000000000000000000001 /* Citadel */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1A0000000000000000000000B /* Sorter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Sorter.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1B00000000000000000000001 /* SorterApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SorterApp.swift; sourceTree = "<group>"; };
+		1B00000000000000000000002 /* NetworkDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDevice.swift; sourceTree = "<group>"; };
+		1B00000000000000000000003 /* RouteEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteEntry.swift; sourceTree = "<group>"; };
+		1B00000000000000000000004 /* ManagedRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedRoute.swift; sourceTree = "<group>"; };
+		1B00000000000000000000005 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
+		1B00000000000000000000006 /* IPValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPValidator.swift; sourceTree = "<group>"; };
+		1B00000000000000000000007 /* RouteTableParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTableParser.swift; sourceTree = "<group>"; };
+		1B00000000000000000000008 /* PrivilegedRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedRunner.swift; sourceTree = "<group>"; };
+		1B00000000000000000000009 /* RouteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteService.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000A /* NetworkDeviceService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDeviceService.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000B /* ManagedRouteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedRouteStore.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000C /* DevicesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesViewModel.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000D /* RoutesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutesViewModel.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1B0000000000000000000000F /* DevicesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicesView.swift; sourceTree = "<group>"; };
+		1B00000000000000000000010 /* RoutesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutesView.swift; sourceTree = "<group>"; };
+		1B00000000000000000000011 /* RouteEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteEditView.swift; sourceTree = "<group>"; };
+		1B00000000000000000000013 /* MenuBarStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarStatusView.swift; sourceTree = "<group>"; };
+		1B00000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1B00000000000000000000014 /* TunnelConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfig.swift; sourceTree = "<group>"; };
+		1B00000000000000000000015 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		1B00000000000000000000016 /* TunnelConfigStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelConfigStore.swift; sourceTree = "<group>"; };
+		1B00000000000000000000017 /* SSHTunnelService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHTunnelService.swift; sourceTree = "<group>"; };
+		1B00000000000000000000018 /* LocalPortListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalPortListener.swift; sourceTree = "<group>"; };
+		1B00000000000000000000019 /* TunnelsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelsViewModel.swift; sourceTree = "<group>"; };
+		1B0000000000000000000001A /* TunnelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelsView.swift; sourceTree = "<group>"; };
+		1B0000000000000000000001B /* TunnelEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelEditView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1A0000000000000000000000E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2C00000000000000000000001 /* Citadel in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1A00000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				1A00000000000000000000004 /* Sorter */,
+				1A00000000000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A0000000000000000000000B /* Sorter.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000004 /* Sorter */ = {
+			isa = PBXGroup;
+			children = (
+				1B00000000000000000000001 /* SorterApp.swift */,
+				1A00000000000000000000005 /* Models */,
+				1A00000000000000000000006 /* Services */,
+				1A00000000000000000000007 /* Store */,
+				1A00000000000000000000008 /* ViewModels */,
+				1A00000000000000000000009 /* Views */,
+				1B00000000000000000000012 /* Assets.xcassets */,
+			);
+			path = Sorter;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000005 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1B00000000000000000000002 /* NetworkDevice.swift */,
+				1B00000000000000000000003 /* RouteEntry.swift */,
+				1B00000000000000000000004 /* ManagedRoute.swift */,
+				1B00000000000000000000014 /* TunnelConfig.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000006 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				1B00000000000000000000005 /* CommandRunner.swift */,
+				1B00000000000000000000006 /* IPValidator.swift */,
+				1B00000000000000000000007 /* RouteTableParser.swift */,
+				1B00000000000000000000008 /* PrivilegedRunner.swift */,
+				1B00000000000000000000009 /* RouteService.swift */,
+				1B0000000000000000000000A /* NetworkDeviceService.swift */,
+				1B00000000000000000000017 /* SSHTunnelService.swift */,
+				1B00000000000000000000018 /* LocalPortListener.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000007 /* Store */ = {
+			isa = PBXGroup;
+			children = (
+				1B0000000000000000000000B /* ManagedRouteStore.swift */,
+				1B00000000000000000000015 /* KeychainHelper.swift */,
+				1B00000000000000000000016 /* TunnelConfigStore.swift */,
+			);
+			path = Store;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000008 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				1B0000000000000000000000C /* DevicesViewModel.swift */,
+				1B0000000000000000000000D /* RoutesViewModel.swift */,
+				1B00000000000000000000019 /* TunnelsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		1A00000000000000000000009 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				1B0000000000000000000000E /* ContentView.swift */,
+				1B0000000000000000000000F /* DevicesView.swift */,
+				1B00000000000000000000010 /* RoutesView.swift */,
+				1B00000000000000000000011 /* RouteEditView.swift */,
+				1B00000000000000000000013 /* MenuBarStatusView.swift */,
+				1B0000000000000000000001A /* TunnelsView.swift */,
+				1B0000000000000000000001B /* TunnelEditView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1A0000000000000000000000A /* Sorter */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1A00000000000000000000010 /* Build configuration list for PBXNativeTarget "Sorter" */;
+			buildPhases = (
+				1A0000000000000000000000C /* Sources */,
+				1A0000000000000000000000E /* Frameworks */,
+				1A0000000000000000000000D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Sorter;
+			packageProductDependencies = (
+				2B00000000000000000000001 /* Citadel */,
+			);
+			productName = Sorter;
+			productReference = 1A0000000000000000000000B /* Sorter.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					1A0000000000000000000000A = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = 1A0000000000000000000000F /* Build configuration list for PBXProject "Sorter" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 1A00000000000000000000002;
+			productRefGroup = 1A00000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			packageReferences = (
+				2A00000000000000000000001 /* XCRemoteSwiftPackageReference "Citadel" */,
+			);
+			targets = (
+				1A0000000000000000000000A /* Sorter */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1A0000000000000000000000D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C00000000000000000000012 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1A0000000000000000000000C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1C00000000000000000000001 /* SorterApp.swift in Sources */,
+				1C00000000000000000000002 /* NetworkDevice.swift in Sources */,
+				1C00000000000000000000003 /* RouteEntry.swift in Sources */,
+				1C00000000000000000000004 /* ManagedRoute.swift in Sources */,
+				1C00000000000000000000005 /* CommandRunner.swift in Sources */,
+				1C00000000000000000000006 /* IPValidator.swift in Sources */,
+				1C00000000000000000000007 /* RouteTableParser.swift in Sources */,
+				1C00000000000000000000008 /* PrivilegedRunner.swift in Sources */,
+				1C00000000000000000000009 /* RouteService.swift in Sources */,
+				1C0000000000000000000000A /* NetworkDeviceService.swift in Sources */,
+				1C0000000000000000000000B /* ManagedRouteStore.swift in Sources */,
+				1C0000000000000000000000C /* DevicesViewModel.swift in Sources */,
+				1C0000000000000000000000D /* RoutesViewModel.swift in Sources */,
+				1C0000000000000000000000E /* ContentView.swift in Sources */,
+				1C0000000000000000000000F /* DevicesView.swift in Sources */,
+				1C00000000000000000000010 /* RoutesView.swift in Sources */,
+				1C00000000000000000000011 /* RouteEditView.swift in Sources */,
+				1C00000000000000000000013 /* MenuBarStatusView.swift in Sources */,
+				1C00000000000000000000014 /* TunnelConfig.swift in Sources */,
+				1C00000000000000000000015 /* KeychainHelper.swift in Sources */,
+				1C00000000000000000000016 /* TunnelConfigStore.swift in Sources */,
+				1C00000000000000000000017 /* SSHTunnelService.swift in Sources */,
+				1C00000000000000000000018 /* LocalPortListener.swift in Sources */,
+				1C00000000000000000000019 /* TunnelsViewModel.swift in Sources */,
+				1C0000000000000000000001A /* TunnelsView.swift in Sources */,
+				1C0000000000000000000001B /* TunnelEditView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		2A00000000000000000000001 /* XCRemoteSwiftPackageReference "Citadel" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/orlandos-nl/Citadel.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		2B00000000000000000000001 /* Citadel */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2A00000000000000000000001 /* XCRemoteSwiftPackageReference "Citadel" */;
+			productName = Citadel;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+/* Begin XCBuildConfiguration section */
+		1A00000000000000000000011 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		1A00000000000000000000012 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		1A00000000000000000000013 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cheilpengtai.Sorter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		1A00000000000000000000014 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 4;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cheilpengtai.Sorter;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1A0000000000000000000000F /* Build configuration list for PBXProject "Sorter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A00000000000000000000011 /* Debug */,
+				1A00000000000000000000012 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1A00000000000000000000010 /* Build configuration list for PBXNativeTarget "Sorter" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1A00000000000000000000013 /* Debug */,
+				1A00000000000000000000014 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1A00000000000000000000001 /* Project object */;
+}
