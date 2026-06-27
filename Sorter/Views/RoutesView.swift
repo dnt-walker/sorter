@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import UniformTypeIdentifiers
 
 struct RoutesView: View {
     @EnvironmentObject private var viewModel: RoutesViewModel
@@ -67,6 +69,17 @@ struct RoutesView: View {
             .help("저장된 사용자 라우트 중 라우팅 테이블에 없는 항목을 다시 등록합니다.")
             .disabled(viewModel.isLoading)
 
+            Button { exportRoutes() } label: {
+                Label("내보내기", systemImage: "square.and.arrow.up")
+            }
+            .disabled(viewModel.store.routes.isEmpty)
+            .help("사용자 라우트를 JSON 파일로 내보냅니다.")
+
+            Button { importRoutes() } label: {
+                Label("불러오기", systemImage: "square.and.arrow.down")
+            }
+            .help("라우트 파일에서 불러옵니다. 중복(목적지·프리픽스·인터페이스)은 건너뜁니다.")
+
             Button {
                 editSheet = EditSheet(route: nil)
             } label: {
@@ -75,6 +88,49 @@ struct RoutesView: View {
             .keyboardShortcut("n", modifiers: .command)
         }
         .padding()
+    }
+
+    // MARK: - 내보내기 / 불러오기
+
+    private func exportRoutes() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "sorter-routes.json"
+        panel.prompt = "내보내기"
+        panel.message = "사용자 라우트를 저장할 위치를 선택하세요."
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            do {
+                try viewModel.exportRoutes(to: url)
+                viewModel.statusMessage = "라우트 \(viewModel.store.routes.count)개를 내보냈습니다."
+            } catch {
+                viewModel.errorMessage = "내보내기 실패: \(error.localizedDescription)"
+            }
+        }
+    }
+
+    private func importRoutes() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.prompt = "불러오기"
+        panel.message = "가져올 Sorter 라우트 JSON 파일을 선택하세요."
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            do {
+                let result = try viewModel.importRoutes(from: url)
+                if result.added == 0 && result.skipped == 0 {
+                    viewModel.statusMessage = "불러올 라우트가 없습니다."
+                } else if result.skipped == 0 {
+                    viewModel.statusMessage = "\(result.added)개를 불러왔습니다."
+                } else {
+                    viewModel.statusMessage = "\(result.added)개 추가, \(result.skipped)개 중복 건너뜀."
+                }
+            } catch {
+                viewModel.errorMessage = "불러오기 실패: \(error.localizedDescription)"
+            }
+        }
     }
 
     // MARK: - Table
@@ -87,6 +143,10 @@ struct RoutesView: View {
                     .help(row.isManaged ? "사용자 라우트" : "시스템 라우트 (보호됨)")
             }
             .width(28)
+            TableColumn("이름") { row in
+                Text(row.name)
+                    .foregroundStyle(row.isEnabled ? Color.primary : Color.secondary)
+            }
             TableColumn("목적지") { row in
                 Text(row.destination)
                     .foregroundStyle(row.isEnabled ? Color.primary : Color.secondary)
@@ -159,6 +219,7 @@ struct RoutesView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("세부 정보 (\(row.destination)\(row.isManaged ? row.prefixText : "") → \(row.interface))")
                         .font(.headline)
+                    DetailRow("이름", row.name)
                     DetailRow("목적지", row.destination)
                     DetailRow("프리픽스", row.prefixText.isEmpty ? "—" : row.prefixText)
                     DetailRow("인터페이스", row.interface)

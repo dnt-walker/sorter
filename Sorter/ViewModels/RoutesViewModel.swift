@@ -4,6 +4,7 @@ import Combine
 /// 목록에 표시할 통합 라우트 행. 관리(managed) 라우트만 편집/삭제 가능.
 struct RouteRow: Identifiable {
     let id: String
+    let name: String
     let destination: String
     let prefixText: String
     let interface: String
@@ -87,6 +88,7 @@ final class RoutesViewModel: ObservableObject {
             for r in store.routes {
                 result.append(RouteRow(
                     id: "managed:\(r.id.uuidString)",
+                    name: r.name,
                     destination: r.destination,
                     prefixText: r.prefixText,
                     interface: r.interface,
@@ -104,6 +106,7 @@ final class RoutesViewModel: ObservableObject {
             for e in systemRoutes where !managedKeys.contains(e.destination) {
                 result.append(RouteRow(
                     id: "system:\(e.id)",
+                    name: "—",
                     destination: e.destination,
                     prefixText: e.isDefault ? "—" : "",
                     interface: e.interface ?? "—",
@@ -121,8 +124,9 @@ final class RoutesViewModel: ObservableObject {
 
     // MARK: - 추가 / 수정 / 삭제
 
-    /// 추가 또는 수정. 검증 후 route 명령 실행, 성공 시 스토어 반영.
-    func save(_ route: ManagedRoute, isEditing: Bool) async -> Bool {
+    /// 추가 또는 수정.
+    /// - apply: true이면 route 명령도 실행(라우팅 테이블 반영), false이면 스토어에만 저장.
+    func save(_ route: ManagedRoute, isEditing: Bool, apply: Bool = true) async -> Bool {
         errorMessage = nil
         statusMessage = nil
 
@@ -135,7 +139,9 @@ final class RoutesViewModel: ObservableObject {
             errorMessage = RouteError.invalidPrefix.localizedDescription
             return false
         }
-        guard let device = devices.first(where: { $0.bsdName == route.interface }) else {
+        let device = devices.first(where: { $0.bsdName == route.interface })
+        // apply 시에는 인터페이스가 실제 존재해야 한다. 저장만 할 때는 허용한다.
+        if device == nil && apply {
             errorMessage = RouteError.unknownInterface.localizedDescription
             return false
         }
@@ -146,7 +152,8 @@ final class RoutesViewModel: ObservableObject {
         }
         // A안: 게이트웨이 없이(=interface 라우트) 비로컬 목적지를 추가하면 패킷이 로컬 링크로만
         // 나가 도달하지 못한다. 비로컬이면 게이트웨이를 요구한다.
-        if !hasGateway, device.isInLocalSubnet(route.destination) == false {
+        // 인터페이스가 없어 로컬 서브넷 판단이 불가능한 경우에는 이 검증을 건너뛴다.
+        if let device, !hasGateway, device.isInLocalSubnet(route.destination) == false {
             let suggestion = device.gateway.map { " (예: \($0))" } ?? ""
             errorMessage = "목적지가 \(route.interface)의 로컬 서브넷 밖입니다. next-hop 게이트웨이를 지정하세요\(suggestion)."
             return false
@@ -161,17 +168,19 @@ final class RoutesViewModel: ObservableObject {
             return false
         }
 
-        let routeService = self.routeService
-        do {
-            if isEditing, let old = store.route(withID: route.id) {
-                // 수정: 기존 삭제 후 추가 (CLAUDE.md 정책).
-                try await Task.detached { try routeService.delete(old) }.value
+        if apply {
+            let routeService = self.routeService
+            do {
+                if isEditing, let old = store.route(withID: route.id) {
+                    // 수정: 기존 삭제 후 추가 (CLAUDE.md 정책).
+                    try await Task.detached { try routeService.delete(old) }.value
+                }
+                try await Task.detached { try routeService.add(route) }.value
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                // 사용자 취소는 변경 없음으로 처리.
+                return false
             }
-            try await Task.detached { try routeService.add(route) }.value
-        } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
-            // 사용자 취소는 변경 없음으로 처리.
-            return false
         }
 
         if isEditing {
@@ -179,7 +188,11 @@ final class RoutesViewModel: ObservableObject {
         } else {
             store.add(route)
         }
-        statusMessage = isEditing ? "라우트를 수정했습니다." : "라우트를 추가했습니다."
+        if apply {
+            statusMessage = isEditing ? "라우트를 수정·적용했습니다." : "라우트를 추가·적용했습니다."
+        } else {
+            statusMessage = isEditing ? "라우트를 저장했습니다. (재반영 필요)" : "라우트를 저장했습니다. (재반영 필요)"
+        }
         refresh()
         return true
     }
@@ -233,6 +246,42 @@ final class RoutesViewModel: ObservableObject {
 
         store.update(updated)
         refresh()
+    }
+
+    // MARK: - 내보내기 / 불러오기
+
+    /// 관리 라우트 전체를 JSON 파일로 내보낸다.
+    func exportRoutes(to url: URL) throws {
+        let payload = RouteExportPayload(version: 1, routes: store.routes.map(RouteExportItem.init))
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        let data = try encoder.encode(payload)
+        try data.write(to: url, options: .atomic)
+    }
+
+    /// JSON 파일에서 라우트를 읽어 중복(목적지+프리픽스+인터페이스)이 아닌 항목만 스토어에 추가한다.
+    /// 불러온 라우트는 스토어에만 저장되며 라우팅 테이블에는 즉시 반영하지 않는다.
+    func importRoutes(from url: URL) throws -> (added: Int, skipped: Int) {
+        let data = try Data(contentsOf: url)
+        let payload = try JSONDecoder().decode(RouteExportPayload.self, from: data)
+
+        var added = 0
+        var skipped = 0
+        for item in payload.routes {
+            let isDuplicate = store.routes.contains {
+                $0.destination == item.destination &&
+                $0.prefix      == item.prefix &&
+                $0.interface   == item.interface
+            }
+            if isDuplicate {
+                skipped += 1
+            } else {
+                store.add(item.toManagedRoute())
+                added += 1
+            }
+        }
+        if added > 0 { refresh() }
+        return (added, skipped)
     }
 
     // MARK: - 재반영 (저장된 사용자 라우트 중 미적용 항목을 다시 등록)

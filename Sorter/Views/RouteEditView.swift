@@ -7,6 +7,7 @@ struct RouteEditView: View {
 
     @Environment(\.dismiss) private var dismiss
 
+    @State private var name: String = "-"
     @State private var kind: RouteKind = .net
     @State private var destination: String = ""
     @State private var prefix: Int = 24
@@ -27,6 +28,13 @@ struct RouteEditView: View {
         devices.first { $0.bsdName == interface }
     }
 
+    /// 수정 모드에서 기존 인터페이스가 현재 시스템에 없는 경우 해당 이름을 반환한다.
+    private var offlineInterface: String? {
+        guard isEditing, let r = existing,
+              !routableDevices.contains(where: { $0.bsdName == r.interface }) else { return nil }
+        return r.interface
+    }
+
     /// 목적지가 선택된 인터페이스의 로컬 서브넷에 속하는지. nil=판단 불가.
     private var destinationIsLocal: Bool? {
         let dest = destination.trimmingCharacters(in: .whitespaces)
@@ -42,6 +50,8 @@ struct RouteEditView: View {
             Divider()
 
             Form {
+                TextField("이름", text: $name)
+
                 Picker("목적지 유형", selection: $kind) {
                     ForEach(RouteKind.allCases) { Text($0.label).tag($0) }
                 }
@@ -74,6 +84,10 @@ struct RouteEditView: View {
                     Text("선택…").tag("")
                     ForEach(routableDevices) { d in
                         Text("\(d.bsdName) — \(d.displayName)").tag(d.bsdName)
+                    }
+                    if let offline = offlineInterface {
+                        Divider()
+                        Text("\(offline) (현재 없음)").tag(offline)
                     }
                 }
                 .onChange(of: interface) { _ in
@@ -112,8 +126,11 @@ struct RouteEditView: View {
                 Spacer()
                 Button("취소") { dismiss() }
                     .keyboardShortcut(.cancelAction)
-                Button(isEditing ? "저장·적용" : "추가·적용") { submit() }
+                Button(isEditing ? "저장" : "추가") { submit(apply: false) }
+                    .disabled(isSubmitting)
+                Button(isEditing ? "저장·적용" : "적용") { submit(apply: true) }
                     .keyboardShortcut(.defaultAction)
+                    .buttonStyle(.borderedProminent)
                     .disabled(isSubmitting)
             }
             .padding()
@@ -211,12 +228,14 @@ struct RouteEditView: View {
     private func draftRoute() -> ManagedRoute {
         ManagedRoute(
             id: existing?.id ?? UUID(),
+            name: name.trimmingCharacters(in: .whitespaces),
             destination: destination.trimmingCharacters(in: .whitespaces),
             prefix: kind == .host ? maxPrefix : prefix,
             kind: kind,
             interface: interface,
             gateway: gateway.trimmingCharacters(in: .whitespaces),
-            createdAt: existing?.createdAt ?? Date()
+            createdAt: existing?.createdAt ?? Date(),
+            isEnabled: existing?.isEnabled ?? true
         )
     }
 
@@ -225,6 +244,7 @@ struct RouteEditView: View {
             interface = routableDevices.first?.bsdName ?? ""
             return
         }
+        name = r.name
         kind = r.kind
         destination = r.destination
         prefix = r.prefix
@@ -232,7 +252,7 @@ struct RouteEditView: View {
         gateway = r.gateway ?? ""
     }
 
-    private func submit() {
+    private func submit(apply: Bool) {
         localError = nil
         guard !interface.isEmpty else {
             localError = "대상 인터페이스를 선택하세요."
@@ -240,7 +260,7 @@ struct RouteEditView: View {
         }
         isSubmitting = true
         Task {
-            let ok = await viewModel.save(draftRoute(), isEditing: isEditing)
+            let ok = await viewModel.save(draftRoute(), isEditing: isEditing, apply: apply)
             isSubmitting = false
             if ok { dismiss() }
         }

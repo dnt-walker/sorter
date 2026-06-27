@@ -13,6 +13,8 @@ enum RouteKind: String, Codable, CaseIterable, Identifiable {
 /// 기본/시스템 라우트는 여기에 들어오지 않으므로 보호된다.
 struct ManagedRoute: Identifiable, Codable, Hashable {
     let id: UUID
+    /// 사용자 지정 이름. 기본값 "-".
+    var name: String
     var destination: String
     /// 프리픽스 길이. host인 경우 IPv4=32 / IPv6=128.
     var prefix: Int
@@ -26,6 +28,7 @@ struct ManagedRoute: Identifiable, Codable, Hashable {
     var isEnabled: Bool
 
     init(id: UUID = UUID(),
+         name: String = "-",
          destination: String,
          prefix: Int,
          kind: RouteKind,
@@ -34,6 +37,7 @@ struct ManagedRoute: Identifiable, Codable, Hashable {
          createdAt: Date = Date(),
          isEnabled: Bool = true) {
         self.id = id
+        self.name = name.isEmpty ? "-" : name
         self.destination = destination
         self.prefix = prefix
         self.kind = kind
@@ -41,6 +45,20 @@ struct ManagedRoute: Identifiable, Codable, Hashable {
         self.gateway = (gateway?.isEmpty == true) ? nil : gateway
         self.createdAt = createdAt
         self.isEnabled = isEnabled
+    }
+
+    // 기존 JSON(name/isEnabled 필드 없음)을 읽을 때 기본값을 적용한다.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id          = try c.decode(UUID.self,     forKey: .id)
+        name        = try c.decodeIfPresent(String.self, forKey: .name) ?? "-"
+        destination = try c.decode(String.self,   forKey: .destination)
+        prefix      = try c.decode(Int.self,      forKey: .prefix)
+        kind        = try c.decode(RouteKind.self, forKey: .kind)
+        interface   = try c.decode(String.self,   forKey: .interface)
+        gateway     = try c.decodeIfPresent(String.self, forKey: .gateway)
+        createdAt   = try c.decode(Date.self,     forKey: .createdAt)
+        isEnabled   = try c.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? true
     }
 
     var isIPv6: Bool { destination.contains(":") }

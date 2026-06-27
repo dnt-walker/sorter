@@ -11,6 +11,7 @@
 		1C00000000000000000000002 /* NetworkDevice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000002 /* NetworkDevice.swift */; };
 		1C00000000000000000000003 /* RouteEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000003 /* RouteEntry.swift */; };
 		1C00000000000000000000004 /* ManagedRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000004 /* ManagedRoute.swift */; };
+		1C0000000000000000000001C /* RouteExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001C /* RouteExport.swift */; };
 		1C00000000000000000000005 /* CommandRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000005 /* CommandRunner.swift */; };
 		1C00000000000000000000006 /* IPValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000006 /* IPValidator.swift */; };
 		1C00000000000000000000007 /* RouteTableParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000007 /* RouteTableParser.swift */; };
@@ -43,6 +44,7 @@
 		1B00000000000000000000002 /* NetworkDevice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkDevice.swift; sourceTree = "<group>"; };
 		1B00000000000000000000003 /* RouteEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteEntry.swift; sourceTree = "<group>"; };
 		1B00000000000000000000004 /* ManagedRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedRoute.swift; sourceTree = "<group>"; };
+		1B0000000000000000000001C /* RouteExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteExport.swift; sourceTree = "<group>"; };
 		1B00000000000000000000005 /* CommandRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandRunner.swift; sourceTree = "<group>"; };
 		1B00000000000000000000006 /* IPValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IPValidator.swift; sourceTree = "<group>"; };
 		1B00000000000000000000007 /* RouteTableParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteTableParser.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 				1B00000000000000000000002 /* NetworkDevice.swift */,
 				1B00000000000000000000003 /* RouteEntry.swift */,
 				1B00000000000000000000004 /* ManagedRoute.swift */,
+				1B0000000000000000000001C /* RouteExport.swift */,
 				1B00000000000000000000014 /* TunnelConfig.swift */,
 			);
 			path = Models;
@@ -271,6 +274,7 @@
 				1C00000000000000000000019 /* TunnelsViewModel.swift in Sources */,
 				1C0000000000000000000001A /* TunnelsView.swift in Sources */,
 				1C0000000000000000000001B /* TunnelEditView.swift in Sources */,
+				1C0000000000000000000001C /* RouteExport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
