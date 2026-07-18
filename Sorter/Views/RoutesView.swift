@@ -7,6 +7,7 @@ struct RoutesView: View {
 
     @State private var editSheet: EditSheet?
     @State private var routeToDelete: ManagedRoute?
+    @State private var showDomainSheet = false
 
     private struct EditSheet: Identifiable {
         let id = UUID()
@@ -15,19 +16,23 @@ struct RoutesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
             table
             Divider()
             detail.frame(height: 200)
             statusBar
         }
         .onAppear { viewModel.refresh() }
+        .navigationTitle("Routing Table")
+        .toolbar { toolbarContent }
         .sheet(item: $editSheet) { sheet in
             RouteEditView(
                 viewModel: viewModel,
                 devices: viewModel.devices,
                 existing: sheet.route
             )
+        }
+        .sheet(isPresented: $showDomainSheet) {
+            DomainRouteView(viewModel: viewModel, devices: viewModel.devices)
         }
         .alert("라우트를 삭제할까요?", isPresented: deleteAlertBinding, presenting: routeToDelete) { route in
             Button("취소", role: .cancel) {}
@@ -39,34 +44,57 @@ struct RoutesView: View {
         }
     }
 
-    // MARK: - Header
+    // MARK: - Toolbar
 
-    private var header: some View {
-        HStack {
-            Text("라우트").font(.title2).bold()
-            Spacer()
+    @ToolbarContentBuilder
+    private var toolbarContent: some ToolbarContent {
+        ToolbarItemGroup {
             Picker("필터", selection: $viewModel.filter) {
                 ForEach(RouteFilter.allCases) { Text($0.rawValue).tag($0) }
             }
             .pickerStyle(.menu)
-            .frame(width: 150)
             .labelsHidden()
+            .help("표시할 라우트 종류를 선택합니다.")
 
             Button { viewModel.refresh() } label: {
                 Label("새로고침", systemImage: "arrow.clockwise")
             }
             .disabled(viewModel.isLoading)
 
-            Button {
-                Task { await viewModel.reapplyMissing() }
+            Menu {
+                Button {
+                    Task { await viewModel.reapplyMissing() }
+                } label: {
+                    if viewModel.missingCount > 0 {
+                        Label("재반영 (\(viewModel.missingCount))", systemImage: "arrow.triangle.2.circlepath")
+                    } else {
+                        Label("재반영", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                }
+                .help("적용 설정(미적용 상태)인데 라우팅 테이블에 없는 항목만 다시 등록합니다.")
+
+                Divider()
+
+                Button {
+                    Task { await viewModel.enableAll() }
+                } label: {
+                    Label("전체 활성화", systemImage: "play.circle")
+                }
+                .help("모든 사용자 라우트를 라우팅 테이블에 등록합니다.")
+
+                Button {
+                    Task { await viewModel.disableAll() }
+                } label: {
+                    Label("전체 비활성화", systemImage: "pause.circle")
+                }
+                .help("모든 사용자 라우트를 라우팅 테이블에서 제거합니다. (설정은 삭제되지 않음)")
             } label: {
                 if viewModel.missingCount > 0 {
-                    Label("재반영 (\(viewModel.missingCount))", systemImage: "arrow.triangle.2.circlepath")
+                    Label("일괄 작업 (\(viewModel.missingCount))", systemImage: "arrow.triangle.2.circlepath")
                 } else {
-                    Label("재반영", systemImage: "arrow.triangle.2.circlepath")
+                    Label("일괄 작업", systemImage: "arrow.triangle.2.circlepath")
                 }
             }
-            .help("저장된 사용자 라우트 중 라우팅 테이블에 없는 항목을 다시 등록합니다.")
             .disabled(viewModel.isLoading)
 
             Button { exportRoutes() } label: {
@@ -81,13 +109,19 @@ struct RoutesView: View {
             .help("라우트 파일에서 불러옵니다. 중복(목적지·프리픽스·인터페이스)은 건너뜁니다.")
 
             Button {
+                showDomainSheet = true
+            } label: {
+                Label("도메인 IP", systemImage: "globe")
+            }
+            .help("도메인의 IPv4 주소를 모두 조회해 호스트 라우트로 일괄 추가합니다.")
+
+            Button {
                 editSheet = EditSheet(route: nil)
             } label: {
                 Label("라우트 추가", systemImage: "plus")
             }
             .keyboardShortcut("n", modifiers: .command)
         }
-        .padding()
     }
 
     // MARK: - 내보내기 / 불러오기
@@ -137,12 +171,8 @@ struct RoutesView: View {
 
     private var table: some View {
         Table(viewModel.rows, selection: $viewModel.selectedRowID) {
-            TableColumn("") { row in
-                Image(systemName: row.isManaged ? "pencil.circle" : "lock.fill")
-                    .foregroundStyle(row.isManaged ? Color.accentColor : Color.secondary)
-                    .help(row.isManaged ? "사용자 라우트" : "시스템 라우트 (보호됨)")
-            }
-            .width(28)
+            TableColumn("상태") { row in statusBadge(row) }
+                .width(36)
             TableColumn("이름") { row in
                 Text(row.name)
                     .foregroundStyle(row.isEnabled ? Color.primary : Color.secondary)
@@ -163,23 +193,34 @@ struct RoutesView: View {
                 Text(row.typeText)
                     .foregroundStyle(row.isEnabled ? Color.primary : Color.secondary)
             }
-            TableColumn("적용") { row in appliedBadge(row) }
-                .width(60)
             TableColumn("액션") { row in actions(for: row) }
-                .width(175)
+                .width(50)
         }
     }
 
+    /// 첫 번째 컬럼: 라우트의 시스템 적용 상태.
+    /// 관리 라우트는 생성/활성화/미적용 3단계, 시스템 라우트는 잠금 표시.
     @ViewBuilder
-    private func appliedBadge(_ row: RouteRow) -> some View {
-        if row.isManaged && !row.isEnabled {
-            Image(systemName: "pause.circle")
+    private func statusBadge(_ row: RouteRow) -> some View {
+        if !row.isManaged {
+            Image(systemName: "lock.fill")
                 .foregroundStyle(Color.secondary)
-                .help("비활성화됨")
-        } else if let applied = row.applied {
-            Image(systemName: applied ? "checkmark.circle.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(applied ? Color.green : Color.orange)
-                .help(applied ? "라우팅 테이블에 존재" : "스토어에만 있음 (재적용 필요)")
+                .help("시스템 라우트 (보호됨) — 라우팅 테이블에 적용됨")
+        } else if let status = row.status {
+            switch status {
+            case .created:
+                Image(systemName: "circle.dotted")
+                    .foregroundStyle(Color.secondary)
+                    .help("생성 — 아직 라우팅 테이블에 적용되지 않음")
+            case .active:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Color.green)
+                    .help("활성화 — 라우팅 테이블에 적용됨")
+            case .notApplied:
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(Color.orange)
+                    .help("미적용 — 적용 설정이지만 라우팅 테이블에 없음 (재반영 필요)")
+            }
         } else {
             Text("—").foregroundStyle(.secondary)
         }
@@ -188,23 +229,36 @@ struct RoutesView: View {
     @ViewBuilder
     private func actions(for row: RouteRow) -> some View {
         if row.isManaged, let managed = row.managed {
-            HStack(spacing: 6) {
-                Button("수정") {
+            Menu {
+                Button {
                     editSheet = EditSheet(route: managed)
+                } label: {
+                    Label("수정", systemImage: "pencil")
                 }
-                .buttonStyle(.borderless)
-                .disabled(!row.isEnabled)
 
-                Button(row.isEnabled ? "비활성화" : "활성화") {
+                Button {
                     Task { await viewModel.toggleEnabled(managed) }
+                } label: {
+                    if row.isEnabled {
+                        Label("비활성화", systemImage: "pause.circle")
+                    } else {
+                        Label("활성화", systemImage: "play.circle")
+                    }
                 }
-                .buttonStyle(.borderless)
-                .foregroundStyle(row.isEnabled ? Color.orange : Color.accentColor)
 
-                Button("삭제") { routeToDelete = managed }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(.red)
+                Divider()
+
+                Button(role: .destructive) {
+                    routeToDelete = managed
+                } label: {
+                    Label("삭제", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .imageScale(.large)
             }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
         } else {
             Text("—").foregroundStyle(.secondary)
         }
@@ -227,7 +281,7 @@ struct RoutesView: View {
                     if let managed = row.managed {
                         DetailRow("게이트웨이", managed.gateway ?? "(interface 라우트)")
                         DetailRow("등록일", managed.createdAt.formatted(date: .numeric, time: .shortened))
-                        DetailRow("적용 상태", (row.applied ?? false) ? "✅ 라우팅 테이블에 존재" : "⚠️ 스토어에만 있음")
+                        DetailRow("상태", row.status.map(statusText) ?? "—")
                     } else {
                         Text("시스템 라우트는 보호되어 수정/삭제할 수 없습니다.")
                             .font(.callout)
@@ -242,6 +296,14 @@ struct RoutesView: View {
             Text("라우트를 선택하세요.")
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
+    private func statusText(_ status: RouteStatus) -> String {
+        switch status {
+        case .created:    return "생성 — 아직 라우팅 테이블에 적용되지 않음"
+        case .active:     return "✅ 활성화 — 라우팅 테이블에 적용됨"
+        case .notApplied: return "⚠️ 미적용 — 적용 설정이지만 라우팅 테이블에 없음 (재반영 필요)"
         }
     }
 

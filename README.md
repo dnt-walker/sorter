@@ -51,7 +51,7 @@ Sorter는 macOS의 네트워크 설정을 GUI로 다루는 유틸리티입니다
 
 ## 다운로드 & 설치
 
-1. [**Releases**](../../releases/latest) 페이지에서 `Sorter-1.2.0.dmg` 를 내려받습니다.
+1. [**Releases**](../../releases/latest) 페이지에서 `Sorter-1.3.0.dmg` 를 내려받습니다.
 2. DMG를 열고 `Sorter.app` 을 **Applications** 폴더로 끌어다 놓습니다.
 
 ### ⚠️ 최초 실행 (필수)

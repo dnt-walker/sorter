@@ -8,9 +8,9 @@ enum SidebarItem: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .devices: return "디바이스"
-        case .routes:  return "라우트"
-        case .tunnels: return "SSH 터널"
+        case .devices: return "Network Interface"
+        case .routes:  return "Routing Table"
+        case .tunnels: return "SSH Tunneling"
         }
     }
     var icon: String {

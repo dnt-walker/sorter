@@ -84,10 +84,16 @@ struct RouteService {
         try privileged.runRoute(arguments: deleteArguments(for: route))
     }
 
-    /// 여러 라우트를 한 번의 권한 인증으로 추가한다(재반영용).
+    /// 여러 라우트를 한 번의 권한 인증으로 추가한다(재반영·전체 활성화용).
     func addBatch(_ routes: [ManagedRoute]) throws {
         guard !routes.isEmpty else { return }
         try privileged.runRouteBatch(argumentLists: routes.map { addArguments(for: $0) })
+    }
+
+    /// 여러 라우트를 한 번의 권한 인증으로 삭제한다(전체 비활성화용).
+    func deleteBatch(_ routes: [ManagedRoute]) throws {
+        guard !routes.isEmpty else { return }
+        try privileged.runRouteBatch(argumentLists: routes.map { deleteArguments(for: $0) })
     }
 
     // MARK: - 명령 인자 구성 (미리보기/테스트와 공유)

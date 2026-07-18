@@ -14,10 +14,20 @@ struct TunnelsView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
             table
             Divider()
             statusBar
+        }
+        .navigationTitle("SSH Tunneling")
+        .toolbar {
+            ToolbarItemGroup {
+                Button {
+                    editSheet = EditSheet(config: nil)
+                } label: {
+                    Label("터널 추가", systemImage: "plus")
+                }
+                .keyboardShortcut("n", modifiers: .command)
+            }
         }
         .sheet(item: $editSheet) { sheet in
             TunnelEditView(existing: sheet.config)
@@ -31,22 +41,6 @@ struct TunnelsView: View {
         } message: { config in
             Text("\(config.name) (\(config.localAddress) → \(config.remoteAddress))\n이 설정과 저장된 비밀번호가 모두 삭제됩니다.")
         }
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack {
-            Text("SSH 터널").font(.title2).bold()
-            Spacer()
-            Button {
-                editSheet = EditSheet(config: nil)
-            } label: {
-                Label("터널 추가", systemImage: "plus")
-            }
-            .keyboardShortcut("n", modifiers: .command)
-        }
-        .padding()
     }
 
     // MARK: - Table

@@ -5,8 +5,6 @@ struct DevicesView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-
             if viewModel.isLoading && viewModel.devices.isEmpty {
                 Spacer()
                 ProgressView("불러오는 중…")
@@ -38,18 +36,15 @@ struct DevicesView: View {
             }
         }
         .onAppear { if viewModel.devices.isEmpty { viewModel.refresh() } }
-    }
-
-    private var header: some View {
-        HStack {
-            Text("네트워크 디바이스").font(.title2).bold()
-            Spacer()
-            Button { viewModel.refresh() } label: {
-                Label("새로고침", systemImage: "arrow.clockwise")
+        .navigationTitle("Network Interface")
+        .toolbar {
+            ToolbarItemGroup {
+                Button { viewModel.refresh() } label: {
+                    Label("새로고침", systemImage: "arrow.clockwise")
+                }
+                .disabled(viewModel.isLoading)
             }
-            .disabled(viewModel.isLoading)
         }
-        .padding()
     }
 
     @ViewBuilder

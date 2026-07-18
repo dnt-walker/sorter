@@ -1,6 +1,24 @@
 import Foundation
 import Combine
 
+/// 관리 라우트의 상태.
+/// - created: JSON(스토어)에서 미적용 설정이고 OS 라우팅 테이블에도 없음 (기본 상태).
+/// - active: OS 라우팅 테이블에 적용되어 있음.
+/// - notApplied: JSON에서는 적용 설정인데 OS 라우팅 테이블에 없음 (재반영 필요).
+enum RouteStatus {
+    case created
+    case active
+    case notApplied
+
+    var label: String {
+        switch self {
+        case .created:    return "생성"
+        case .active:     return "활성화"
+        case .notApplied: return "미적용"
+        }
+    }
+}
+
 /// 목록에 표시할 통합 라우트 행. 관리(managed) 라우트만 편집/삭제 가능.
 struct RouteRow: Identifiable {
     let id: String
@@ -16,6 +34,8 @@ struct RouteRow: Identifiable {
     let applied: Bool?
     /// managed 라우트의 활성 여부 (시스템 라우트는 항상 true).
     let isEnabled: Bool
+    /// managed 라우트의 상태 (시스템 라우트는 nil).
+    let status: RouteStatus?
 }
 
 enum RouteFilter: String, CaseIterable, Identifiable {
@@ -86,6 +106,7 @@ final class RoutesViewModel: ObservableObject {
         let managedKeys = Set(store.routes.map { $0.destination })
         if filter != .system {
             for r in store.routes {
+                let applied = appliedByRouteID[r.id]
                 result.append(RouteRow(
                     id: "managed:\(r.id.uuidString)",
                     name: r.name,
@@ -95,8 +116,9 @@ final class RoutesViewModel: ObservableObject {
                     typeText: "사용자",
                     isManaged: true,
                     managed: r,
-                    applied: appliedByRouteID[r.id],
-                    isEnabled: r.isEnabled
+                    applied: applied,
+                    isEnabled: r.isEnabled,
+                    status: applied.map { $0 ? .active : (r.isEnabled ? .notApplied : .created) }
                 ))
             }
         }
@@ -114,7 +136,8 @@ final class RoutesViewModel: ObservableObject {
                     isManaged: false,
                     managed: nil,
                     applied: nil,
-                    isEnabled: true
+                    isEnabled: true,
+                    status: nil
                 ))
             }
         }
@@ -168,6 +191,14 @@ final class RoutesViewModel: ObservableObject {
             return false
         }
 
+        // 상태 규칙: 적용하면 '활성화' 설정, 새 라우트를 저장만 하면 '생성' 상태(미적용 설정).
+        var route = route
+        if apply {
+            route.isEnabled = true
+        } else if !isEditing {
+            route.isEnabled = false
+        }
+
         if apply {
             let routeService = self.routeService
             do {
@@ -191,7 +222,7 @@ final class RoutesViewModel: ObservableObject {
         if apply {
             statusMessage = isEditing ? "라우트를 수정·적용했습니다." : "라우트를 추가·적용했습니다."
         } else {
-            statusMessage = isEditing ? "라우트를 저장했습니다. (재반영 필요)" : "라우트를 저장했습니다. (재반영 필요)"
+            statusMessage = isEditing ? "라우트를 저장했습니다." : "라우트를 저장했습니다. (생성 상태 — 활성화 필요)"
         }
         refresh()
         return true
@@ -215,6 +246,81 @@ final class RoutesViewModel: ObservableObject {
         store.remove(id: route.id)
         statusMessage = "라우트를 삭제했습니다."
         refresh()
+    }
+
+    // MARK: - 도메인 IP 일괄 추가
+
+    /// 도메인에서 해석된 IP들을 호스트 라우트로 일괄 추가한다.
+    /// 검증 규칙은 save()와 동일하며, 중복(목적지+프리픽스)은 건너뛴다.
+    /// apply 시 addBatch로 권한 인증을 한 번만 받아 적용한다.
+    func addResolvedRoutes(_ routes: [ManagedRoute], apply: Bool) async -> Bool {
+        errorMessage = nil
+        statusMessage = nil
+
+        guard !routes.isEmpty else {
+            errorMessage = "추가할 IP가 없습니다."
+            return false
+        }
+
+        let interface = routes[0].interface
+        let device = devices.first { $0.bsdName == interface }
+        if device == nil && apply {
+            errorMessage = RouteError.unknownInterface.localizedDescription
+            return false
+        }
+        for route in routes {
+            guard IPValidator.isValidIP(route.destination) else {
+                errorMessage = RouteError.invalidDestination.localizedDescription
+                return false
+            }
+            let hasGateway = !(route.gateway ?? "").isEmpty
+            if hasGateway, !IPValidator.isValidIP(route.gateway!) {
+                errorMessage = "게이트웨이 주소가 올바르지 않습니다."
+                return false
+            }
+            // A안: 비로컬 목적지는 게이트웨이 필수 (interface 라우트로는 도달 불가).
+            if let device, !hasGateway, device.isInLocalSubnet(route.destination) == false {
+                errorMessage = "목적지 \(route.destination)이(가) \(interface)의 로컬 서브넷 밖입니다. next-hop 게이트웨이를 지정하세요."
+                return false
+            }
+        }
+
+        var newRoutes: [ManagedRoute] = []
+        var skipped = 0
+        for var route in routes {
+            if store.hasDuplicate(of: route) {
+                skipped += 1
+                continue
+            }
+            route.isEnabled = apply
+            newRoutes.append(route)
+        }
+        guard !newRoutes.isEmpty else {
+            statusMessage = "모든 IP(\(skipped)개)가 이미 등록되어 있습니다."
+            return true
+        }
+
+        if apply {
+            let routeService = self.routeService
+            let batch = newRoutes
+            do {
+                try await Task.detached { try routeService.addBatch(batch) }.value
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                return false
+            }
+        }
+
+        for route in newRoutes { store.add(route) }
+
+        let domainName = routes[0].name
+        var message = apply
+            ? "\(domainName): IP 라우트 \(newRoutes.count)개를 추가·적용했습니다."
+            : "\(domainName): IP 라우트 \(newRoutes.count)개를 저장했습니다. (생성 상태 — 활성화 필요)"
+        if skipped > 0 { message += " (중복 \(skipped)개 건너뜀)" }
+        statusMessage = message
+        refresh()
+        return true
     }
 
     // MARK: - 활성화 / 비활성화
@@ -340,6 +446,103 @@ final class RoutesViewModel: ObservableObject {
                 unresolved.map { "\($0.cidr)→\($0.interface)" }.joined(separator: ", ") + ")"
         }
         statusMessage = message
+        refresh()
+    }
+
+    // MARK: - 전체 활성화 / 전체 비활성화
+
+    /// 모든 관리 라우트를 라우팅 테이블에 등록하고 '활성화' 설정으로 만든다.
+    /// 이미 적용된 항목은 건너뛰고, 인터페이스가 없는 항목은 보고한다. 권한 인증은 한 번만 받는다.
+    func enableAll() async {
+        errorMessage = nil
+        statusMessage = nil
+
+        let managed = store.routes
+        guard !managed.isEmpty else {
+            statusMessage = "관리 라우트가 없습니다."
+            return
+        }
+
+        let routeService = self.routeService
+        let currentApplied = await Task.detached { () -> [UUID: Bool] in
+            var applied: [UUID: Bool] = [:]
+            for r in managed { applied[r.id] = routeService.isApplied(r) }
+            return applied
+        }.value
+        self.appliedByRouteID = currentApplied
+
+        let missing = managed.filter { currentApplied[$0.id] != true }
+        let availableInterfaces = Set(devices.map { $0.bsdName })
+        let applicable = missing.filter { availableInterfaces.contains($0.interface) }
+        let unresolved = missing.filter { !availableInterfaces.contains($0.interface) }
+
+        if !applicable.isEmpty {
+            do {
+                try await Task.detached { try routeService.addBatch(applicable) }.value
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                return
+            }
+        }
+
+        // 적용된(또는 이미 적용돼 있던) 항목만 '활성화' 설정으로 저장한다.
+        let unresolvedIDs = Set(unresolved.map { $0.id })
+        for route in managed where !route.isEnabled && !unresolvedIDs.contains(route.id) {
+            var updated = route
+            updated.isEnabled = true
+            store.update(updated)
+        }
+
+        var message = applicable.isEmpty
+            ? "모든 라우트가 이미 적용되어 있습니다."
+            : "\(applicable.count)개 라우트를 활성화했습니다."
+        if !unresolved.isEmpty {
+            message += " (인터페이스 없음으로 건너뜀: " +
+                unresolved.map { "\($0.cidr)→\($0.interface)" }.joined(separator: ", ") + ")"
+        }
+        statusMessage = message
+        refresh()
+    }
+
+    /// 모든 관리 라우트를 라우팅 테이블에서 제거하고(삭제 아님) '비활성화' 설정으로 만든다.
+    /// 권한 인증은 한 번만 받는다.
+    func disableAll() async {
+        errorMessage = nil
+        statusMessage = nil
+
+        let managed = store.routes
+        guard !managed.isEmpty else {
+            statusMessage = "관리 라우트가 없습니다."
+            return
+        }
+
+        let routeService = self.routeService
+        let currentApplied = await Task.detached { () -> [UUID: Bool] in
+            var applied: [UUID: Bool] = [:]
+            for r in managed { applied[r.id] = routeService.isApplied(r) }
+            return applied
+        }.value
+        self.appliedByRouteID = currentApplied
+
+        let appliedRoutes = managed.filter { currentApplied[$0.id] == true }
+        if !appliedRoutes.isEmpty {
+            do {
+                try await Task.detached { try routeService.deleteBatch(appliedRoutes) }.value
+            } catch {
+                errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                return
+            }
+        }
+
+        for route in managed where route.isEnabled {
+            var updated = route
+            updated.isEnabled = false
+            store.update(updated)
+        }
+
+        statusMessage = appliedRoutes.isEmpty
+            ? "라우팅 테이블에 적용된 라우트가 없어 설정만 비활성화했습니다."
+            : "\(appliedRoutes.count)개 라우트를 비활성화했습니다."
         refresh()
     }
 }

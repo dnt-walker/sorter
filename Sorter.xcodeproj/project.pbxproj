@@ -35,6 +35,8 @@
 		1C00000000000000000000019 /* TunnelsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B00000000000000000000019 /* TunnelsViewModel.swift */; };
 		1C0000000000000000000001A /* TunnelsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001A /* TunnelsView.swift */; };
 		1C0000000000000000000001B /* TunnelEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001B /* TunnelEditView.swift */; };
+		1C0000000000000000000001D /* DomainResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001D /* DomainResolver.swift */; };
+		1C0000000000000000000001E /* DomainRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0000000000000000000001E /* DomainRouteView.swift */; };
 		2C00000000000000000000001 /* Citadel in Frameworks */ = {isa = PBXBuildFile; productRef = 2B00000000000000000000001 /* Citadel */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +70,8 @@
 		1B00000000000000000000019 /* TunnelsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelsViewModel.swift; sourceTree = "<group>"; };
 		1B0000000000000000000001A /* TunnelsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelsView.swift; sourceTree = "<group>"; };
 		1B0000000000000000000001B /* TunnelEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TunnelEditView.swift; sourceTree = "<group>"; };
+		1B0000000000000000000001D /* DomainResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainResolver.swift; sourceTree = "<group>"; };
+		1B0000000000000000000001E /* DomainRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainRouteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,6 +137,7 @@
 				1B00000000000000000000008 /* PrivilegedRunner.swift */,
 				1B00000000000000000000009 /* RouteService.swift */,
 				1B0000000000000000000000A /* NetworkDeviceService.swift */,
+				1B0000000000000000000001D /* DomainResolver.swift */,
 				1B00000000000000000000017 /* SSHTunnelService.swift */,
 				1B00000000000000000000018 /* LocalPortListener.swift */,
 			);
@@ -166,6 +171,7 @@
 				1B0000000000000000000000F /* DevicesView.swift */,
 				1B00000000000000000000010 /* RoutesView.swift */,
 				1B00000000000000000000011 /* RouteEditView.swift */,
+				1B0000000000000000000001E /* DomainRouteView.swift */,
 				1B00000000000000000000013 /* MenuBarStatusView.swift */,
 				1B0000000000000000000001A /* TunnelsView.swift */,
 				1B0000000000000000000001B /* TunnelEditView.swift */,
@@ -275,6 +281,8 @@
 				1C0000000000000000000001A /* TunnelsView.swift in Sources */,
 				1C0000000000000000000001B /* TunnelEditView.swift in Sources */,
 				1C0000000000000000000001C /* RouteExport.swift in Sources */,
+				1C0000000000000000000001D /* DomainResolver.swift in Sources */,
+				1C0000000000000000000001E /* DomainRouteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,7 +367,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -369,7 +377,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cheilpengtai.Sorter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -385,7 +393,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -395,7 +403,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.0;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cheilpengtai.Sorter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

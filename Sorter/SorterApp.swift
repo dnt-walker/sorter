@@ -31,6 +31,7 @@ struct SorterApp: App {
                 }
         }
         .windowResizability(.contentMinSize)
+        .windowToolbarStyle(.expanded)
 
         MenuBarExtra {
             MenuBarStatusView()
